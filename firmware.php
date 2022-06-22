@@ -12,15 +12,25 @@ $time_start = microtime(true);
 
 try {
 
-    $client = new MqttClient(MQTT_BROKER_HOST, MQTT_BROKER_TLS_PORT, 'test-subscriber', MqttClient::MQTT_3_1_1, null, null);
-
-    $connectionSettings = (new ConnectionSettings)->setConnectTimeout(10)
-                                                  ->setUseTls(true)
-                                                  ->setTlsSelfSignedAllowed(true)
-                                                  ->setTlsVerifyPeer(false);
+    $client = new MqttClient(MQTT_BROKER_HOST, MQTT_BROKER_PORT, 'testclientid', MqttClient::MQTT_3_1_1, null, null);
 
     echo 'try to connect...' . PHP_EOL;
-    $client->connect($connectionSettings, true);
+/*    $connectionSettings = (new ConnectionSettings)->setConnectTimeout(10)
+                                                  ->setUseTls(true)
+                                                  ->setTlsSelfSignedAllowed(true)
+                                                  ->setTlsVerifyPeer(false);*/
+
+
+    $client->connect(null, true);
+
+} catch (MqttClientException $e) {
+    // MqttClientException is the base exception of all exceptions in the library. Catching it will catch all MQTT related exceptions.
+    echo 'Failed to connect...' . print_r($e, true) . PHP_EOL;
+    exit('end');
+}
+
+try
+{
     //$client->connect(null, true);
     echo 'client connected!' . PHP_EOL;
 
@@ -51,7 +61,7 @@ try {
 
         // After receiving the first message on the subscribed topic, we want the client to stop listening for messages.
         $client->interrupt();
-    }, MqttClient::QOS_EXACTLY_ONCE);
+    }, MqttClient::QOS_AT_MOST_ONCE);
 
     $payload = [
         'appId'        => 'MYFLIGHT',
@@ -65,7 +75,7 @@ try {
 
     $published_time = (microtime(true) - $time_start);
 
-    $client->publish($topic_publisher, json_encode($payload), MqttClient::QOS_EXACTLY_ONCE);
+    $client->publish($topic_publisher, json_encode($payload), MqttClient::QOS_AT_MOST_ONCE);
 
     $client->loop(true);
 
