@@ -15,13 +15,16 @@ try {
     $client = new MqttClient(MQTT_BROKER_HOST, MQTT_BROKER_PORT, 'testclientid', MqttClient::MQTT_3_1_1, null, null);
 
     echo 'try to connect...' . PHP_EOL;
-/*    $connectionSettings = (new ConnectionSettings)->setConnectTimeout(10)
-                                                  ->setUseTls(true)
-                                                  ->setTlsSelfSignedAllowed(true)
-                                                  ->setTlsVerifyPeer(false);*/
+    $connectionSettings = (new ConnectionSettings)->setConnectTimeout(10)
+                                                  //->setPassword('password')
+                                                  ->setUsername(AUTHORIZATION_USERNAME);
+
+                                                  //->setUseTls(true)
+                                                  //->setTlsSelfSignedAllowed(true)
+                                                  //->setTlsVerifyPeer(false);
 
 
-    $client->connect(null, true);
+    $client->connect($connectionSettings, true);
 
 } catch (MqttClientException $e) {
     // MqttClientException is the base exception of all exceptions in the library. Catching it will catch all MQTT related exceptions.
